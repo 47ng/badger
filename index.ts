@@ -25,7 +25,7 @@ const sniffLicense: BadgeSniffer = async ({ repoSlug }) => {
 }
 
 const sniffTravisCI: BadgeSniffer = async ({ repoSlug }) => {
-  const url = `https://api.github.com/repos/${repoSlug}/.travis.yml`
+  const url = `https://raw.githubusercontent.com/${repoSlug}/master/.travis.yml`
   await axios.get(url) // Will fail if not found
   return {
     description: 'Travis CI Build', // todo: add status

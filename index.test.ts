@@ -9,6 +9,11 @@ test('Get badges for known repository', async () => {
       url: 'https://github.com/47ng/badger/blob/master/LICENSE'
     },
     {
+      description: 'Travis CI Build',
+      image: 'https://img.shields.io/travis/com/47ng/badger.svg',
+      url: 'https://travis-ci.com/47ng/badger'
+    },
+    {
       description: 'Average issue resolution time',
       image: 'https://isitmaintained.com/badge/resolution/47ng/badger.svg',
       url: 'https://isitmaintained.com/project/47ng/badger'
