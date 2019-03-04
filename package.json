@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "main": "index.ts",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "@types/node": "^11.10.4",
     "axios": "^0.18.0",
