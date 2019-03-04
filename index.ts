@@ -20,7 +20,7 @@ const sniffLicense: BadgeSniffer = async ({ repoSlug }) => {
   return {
     description: res.data.license.name,
     url: res.data.html_url,
-    image: `https://img.shields.io/github/license/${repoSlug}.svg`
+    image: `https://img.shields.io/github/license/${repoSlug}.svg?color=blue`
   }
 }
 
