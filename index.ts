@@ -54,7 +54,23 @@ const sniffIsItMaintainedOpenIssues: BadgeSniffer = async ({ repoSlug }) => {
 
 // -----------------------------------------------------------------------------
 
+const getRepositoryInfo = slug => {
+  return axios.get(`https://api.github.com/repos/${slug}`)
+}
+
+// -----------------------------------------------------------------------------
+
 export async function getBadges(repoSlug: string): Promise<Badge[]> {
+  try {
+    await getRepositoryInfo(repoSlug)
+  } catch (error) {
+    if (error.response.status === 404) {
+      throw new Error('Repository not found')
+    } else {
+      console.error(error)
+    }
+  }
+
   const sniffers: BadgeSniffer[] = [
     sniffLicense,
     sniffTravisCI,
@@ -80,9 +96,3 @@ export function renderToMarkdown(badges: Badge[]): string {
   }
   return badges.map(renderBadge).join('\n')
 }
-
-// -----------------------------------------------------------------------------
-
-getBadges('47ng/badger')
-  .then(renderToMarkdown)
-  .then(console.log)
