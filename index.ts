@@ -81,6 +81,6 @@ export function renderToMarkdown(badges: Badge[]): string {
 
 // -----------------------------------------------------------------------------
 
-getBadges('47ng/hashdir')
+getBadges('47ng/badger')
   .then(renderToMarkdown)
   .then(console.log)
