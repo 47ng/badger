@@ -1,7 +1,7 @@
 {
   "name": "badger",
-  "version": "0.0.0",
-  "main": "index.js",
+  "version": "0.1.0",
+  "main": "index.ts",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^11.10.4",
