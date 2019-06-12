@@ -96,3 +96,16 @@ export function renderToMarkdown(badges: Badge[]): string {
   }
   return badges.map(renderBadge).join('\n')
 }
+
+// --
+
+async function main() {
+  const slug = process.argv[2]
+  console.log(slug)
+  const badges = await getBadges(slug)
+  console.log(renderToMarkdown(badges))
+}
+
+if (require.main === module) {
+  main()
+}
