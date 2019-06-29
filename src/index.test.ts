@@ -1,7 +1,7 @@
-import * as badger from './index'
+import { getBadges } from './index'
 
 test('Get badges for known repository', async () => {
-  const received = await badger.getBadges('47ng/badger')
+  const received = await getBadges('47ng/badger')
   const expected = [
     {
       description: 'MIT License',
@@ -28,9 +28,6 @@ test('Get badges for known repository', async () => {
 })
 
 test('Get badges for unknown repository', async () => {
-  try {
-    await badger.getBadges('47ng/definitelydoesnotexist')
-  } catch (error) {
-    expect(error.message).toBe('Repository not found')
-  }
+  const received = getBadges('47ng/definitelydoesnotexist')
+  await expect(received).rejects.toThrowError('Repository not found')
 })
