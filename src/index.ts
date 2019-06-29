@@ -54,7 +54,7 @@ const sniffIsItMaintainedOpenIssues: BadgeSniffer = async ({ repoSlug }) => {
 
 // -----------------------------------------------------------------------------
 
-const getRepositoryInfo = slug => {
+const getRepositoryInfo = (slug: string) => {
   return axios.get(`https://api.github.com/repos/${slug}`)
 }
 
@@ -90,7 +90,7 @@ export async function getBadges(repoSlug: string): Promise<Badge[]> {
 // -----------------------------------------------------------------------------
 
 export function renderToMarkdown(badges: Badge[]): string {
-  const renderBadge = ({ url, image, description }) => {
+  const renderBadge = ({ url, image, description }: Badge) => {
     const markdownImage = `![${description}](${image})`
     return `[${markdownImage}](${url})`
   }

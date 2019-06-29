@@ -1,10 +1,21 @@
 language: node_js
-node_js:
-  - 'node'
-  - 'lts/*'
 
-before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s
-  - export PATH="$HOME/.yarn/bin:$PATH"
+node_js:
+  - node
 
 cache: yarn
+
+script:
+  - yarn ci
+
+deploy:
+  provider: npm
+  email: accounts@francoisbest.com
+  on:
+    tags: true
+  skip_cleanup: true
+
+notifications:
+  slack:
+    on_success: change
+    on_failure: always
