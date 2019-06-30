@@ -15,14 +15,36 @@ type BadgeSniffer = (input: BadgeSnifferInput) => Promise<Badge>
 // -----------------------------------------------------------------------------
 
 const sniffLicense: BadgeSniffer = async ({ repoSlug }) => {
-  const url = `https://api.github.com/repos/${repoSlug}/license`
-  const res = await axios.get(url)
-  return {
-    description: res.data.license.name,
-    url: res.data.html_url,
-    image: `https://img.shields.io/github/license/${repoSlug}.svg?color=blue`
+  try {
+    const url = `https://api.github.com/repos/${repoSlug}/license`
+    const res = await axios.get(url)
+    return {
+      description: res.data.license.name,
+      url: res.data.html_url,
+      image: `https://img.shields.io/github/license/${repoSlug}.svg?color=blue`
+    }
+  } catch (error) {
+    if (error.response.status === 429) {
+      // Too many requests: rate-limiting of the public GitHub API
+      // Fallback to text-sniffing
+      const spellings = ['LICENSE', 'license', 'LICENSE.md', 'license.md']
+      for (const license of spellings) {
+        try {
+          const url = `https://raw.githubusercontent.com/${repoSlug}/master/${license}`
+          const res = await axios.get(url)
+          return {
+            description: (res.data || 'Unknown license').split('\n')[0],
+            url: `https://github.com/${repoSlug}/blob/master/${license}`,
+            image: `https://img.shields.io/github/license/${repoSlug}.svg?color=blue`
+          }
+        } catch (error) {}
+      }
+    }
   }
+  throw new Error('Could not retrieve license data')
 }
+
+// --
 
 const sniffTravisCI: BadgeSniffer = async ({ repoSlug }) => {
   const url = `https://raw.githubusercontent.com/${repoSlug}/master/.travis.yml`
@@ -33,6 +55,8 @@ const sniffTravisCI: BadgeSniffer = async ({ repoSlug }) => {
     image: `https://img.shields.io/travis/com/${repoSlug}.svg`
   }
 }
+
+// --
 
 const sniffIsItMaintainedResolutionTime: BadgeSniffer = async ({
   repoSlug
@@ -54,22 +78,49 @@ const sniffIsItMaintainedOpenIssues: BadgeSniffer = async ({ repoSlug }) => {
 
 // -----------------------------------------------------------------------------
 
-const getRepositoryInfo = (slug: string) => {
-  return axios.get(`https://api.github.com/repos/${slug}`)
+const checkRepositoryExists = async (slug: string) => {
+  try {
+    await axios.get(`https://api.github.com/repos/${slug}`)
+    return
+  } catch (error) {
+    switch (error.response.status) {
+      // Failure cases
+      case 404: // Not found
+        throw new Error('Repository not found')
+      // Fallback cases
+      case 429: // Too many requests: rate-limiting of the public GitHub API
+      case 503: // Service unavailable
+      default:
+        break
+    }
+    // Fallback if rate-limited or service unavailable (don't if 404)
+    // try with various spellings of README.md
+    const spellings = [
+      'README',
+      'readme',
+      'Readme',
+      'ReadMe',
+      'README.md',
+      'readme.md',
+      'Readme.md',
+      'ReadMe.md'
+    ]
+    for (const readme of spellings) {
+      try {
+        await axios.get(
+          `https://raw.githubusercontent.com/${slug}/master/${readme}`
+        )
+        return
+      } catch (error) {}
+    }
+  }
+  throw new Error('Repository not found')
 }
 
 // -----------------------------------------------------------------------------
 
 export async function getBadges(repoSlug: string): Promise<Badge[]> {
-  try {
-    await getRepositoryInfo(repoSlug)
-  } catch (error) {
-    if (error.response.status === 404) {
-      throw new Error('Repository not found')
-    } else {
-      console.error(error)
-    }
-  }
+  await checkRepositoryExists(repoSlug)
 
   const sniffers: BadgeSniffer[] = [
     sniffLicense,
@@ -78,7 +129,7 @@ export async function getBadges(repoSlug: string): Promise<Badge[]> {
     sniffIsItMaintainedOpenIssues
   ]
   let badges = []
-  for (let sniff of sniffers) {
+  for (const sniff of sniffers) {
     try {
       const badge = await sniff({ repoSlug })
       badges.push(badge)
@@ -101,9 +152,12 @@ export function renderToMarkdown(badges: Badge[]): string {
 
 async function main() {
   const slug = process.argv[2]
-  console.log(slug)
-  const badges = await getBadges(slug)
-  console.log(renderToMarkdown(badges))
+  try {
+    const badges = await getBadges(slug)
+    console.log(renderToMarkdown(badges))
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 if (require.main === module) {
