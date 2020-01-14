@@ -16,9 +16,11 @@ deploy:
   on:
     tags: true
   skip_cleanup: true
-notifications:
+
+ notifications:
   slack:
     rooms:
       secure: fdCE6KX084wf63gcaeHCfkSPhfNqlb0xCRiJFHfd3Dyh7vgkhFYR8sF8BAR1+vi3jj2FCpwvATGiNxE2Xe5QCgUFgTs22qN9mERafRl6Lt7GPdPMr3aD1YLBsD8w35BGJG3cY7F35UKJxsB6p/DoCHAr0iwizSI2/4ZbfTqhr4XuZg1qV+Wy09ChFeAMzjgAx9UKuNrCXin8aLQh2ak048xzFjzzYg8kGTVFUXDngxVTgLbmhvVAQdNsbRS2q4c0905+7MchtnW7nQyOhHuVgL+3d65RTL3wyMvI9SZZNBwUqaxAbJrX/dwMi3TOQbzc81/3dymbHM7TBzaPHrj9so2PHpmfSYUTpM+1/0wEElj9kz0eWjF2vjBZ54S+VDRehCeUoecJMVS/nveNYr3nK5+CkP9c4W9/ukyW6YtvkawXScK42tcnCFSaskrG/m7w9mmNzWQ3DcsOELOT7RozJGqSoQd/6rAl3k0qhwzaViLNDJotklO4vJ5unrBr8w/QIL+qrjWZnOm/k3YaRT+HLIotU2ch+SmyhvNDk5lSrExOvPBgg+PY7xFibxlbbjuu16NXtiHjvO/mUEQxmU7wH6744ez75k7TaX3isan8O2QQSfqceUp8BvA7w2ywlle9s+mgCHWL37UKenu3lM9XUBn03ZdszhWvPGCnGI/QS8o=
-    on_success: change
+    on_success: always
     on_failure: always
+    on_error: always
